@@ -1,0 +1,48 @@
+{
+  "name": "robinncode/laravel-db-craft",
+  "description": "Generate Laravel migrations and seeders from existing database connections",
+  "keywords": [
+    "laravel",
+    "migration",
+    "seeder",
+    "database",
+    "generator"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mohammad Shahin Mia Robin",
+      "email": "msmrobin518@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.0|^8.1|^8.2|^8.3",
+    "illuminate/support": "^9.0|^10.0|^11.0",
+    "illuminate/console": "^9.0|^10.0|^11.0",
+    "illuminate/database": "^9.0|^10.0|^11.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.0|^8.0|^9.0",
+    "phpunit/phpunit": "^9.5|^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "RobinNcode\\LaravelDbCraft\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "RobinNcode\\LaravelDbCraft\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "RobinNcode\\LaravelDbCraft\\DbCraftServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
