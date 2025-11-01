@@ -5,6 +5,11 @@ namespace RobinNcode\LaravelDbCraft\Commands;
 use Illuminate\Console\Command;
 use RobinNcode\LaravelDbCraft\Services\SeederGenerator;
 
+/**
+ * Command to generate seeder files from existing database tables with data.
+ * Can generate for all tables or a specific table.
+ * @author RobinNcode
+ */
 class GenerateSeederCommand extends Command
 {
     /**

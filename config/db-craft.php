@@ -56,7 +56,7 @@ return [
     | Number of records to insert per chunk in seeders.
     |
     */
-    'seeder_chunk_size' => 100,
+    'seeder_chunk_size' => 1000,
 
     /*
     |--------------------------------------------------------------------------

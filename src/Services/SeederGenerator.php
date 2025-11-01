@@ -5,6 +5,12 @@ namespace RobinNcode\LaravelDbCraft\Services;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+/**
+ * Service to generate seeders from existing database tables.
+ * Generates seeder files for all tables or specific tables,
+ * including data insertion in chunks.
+ * @author RobinNcode
+ */
 class SeederGenerator
 {
     protected $connection;

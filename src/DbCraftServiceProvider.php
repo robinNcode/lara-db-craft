@@ -6,6 +6,11 @@ use Illuminate\Support\ServiceProvider;
 use RobinNcode\LaravelDbCraft\Commands\GenerateMigrationCommand;
 use RobinNcode\LaravelDbCraft\Commands\GenerateSeederCommand;
 
+/**
+ * Service provider for the DbCraft package.
+ * Registers configuration and console commands.
+ * @author RobinNcode
+ */
 class DbCraftServiceProvider extends ServiceProvider
 {
     /**
