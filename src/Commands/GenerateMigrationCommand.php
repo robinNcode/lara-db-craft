@@ -12,7 +12,7 @@ class GenerateMigrationCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db-craft:migration {table?} {--connection=}';
+    protected $signature = 'get:migration {table?} {--connection=}';
 
     /**
      * The console command description.

@@ -47,19 +47,19 @@ This will create a `config/db-craft.php` file where you can customize the packag
 #### Generate migrations for all tables:
 
 ```bash
-php artisan db-craft:migration
+php artisan get:migration
 ```
 
 #### Generate migration for a specific table:
 
 ```bash
-php artisan db-craft:migration users
+php artisan get:migration users
 ```
 
 #### Use a specific database connection:
 
 ```bash
-php artisan db-craft:migration --connection=mysql
+php artisan get:migration --connection=mysql
 ```
 
 ### Generate Seeders
@@ -67,19 +67,19 @@ php artisan db-craft:migration --connection=mysql
 #### Generate seeders for all tables with data:
 
 ```bash
-php artisan db-craft:seeder
+php artisan get:seeder
 ```
 
 #### Generate seeder for a specific table:
 
 ```bash
-php artisan db-craft:seeder users
+php artisan get:seeder users
 ```
 
 #### Use a specific database connection:
 
 ```bash
-php artisan db-craft:seeder --connection=mysql
+php artisan get:seeder --connection=mysql
 ```
 
 ## Configuration
@@ -127,10 +127,10 @@ DB_USERNAME=root
 DB_PASSWORD=secret
 
 # Generate all migrations
-php artisan db-craft:migration
+php artisan get:migration
 
 # Generate all seeders
-php artisan db-craft:seeder
+php artisan get:seeder
 ```
 
 ### Backing Up Table Data
@@ -139,22 +139,22 @@ Create seeders to backup your current data:
 
 ```bash
 # Generate seeders for all tables
-php artisan db-craft:seeder
+php artisan get:seeder
 
 # Or for specific critical tables
-php artisan db-craft:seeder users
-php artisan db-craft:seeder products
-php artisan db-craft:seeder orders
+php artisan get:seeder users
+php artisan get:seeder products
+php artisan get:seeder orders
 ```
 
 ### Working with Multiple Databases
 
 ```bash
 # Generate migrations from production database
-php artisan db-craft:migration --connection=production
+php artisan get:migration --connection=production
 
 # Generate seeders from staging database
-php artisan db-craft:seeder --connection=staging
+php artisan get:seeder --connection=staging
 ```
 
 ## Generated Files

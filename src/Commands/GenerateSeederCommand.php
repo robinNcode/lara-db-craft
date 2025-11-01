@@ -12,7 +12,7 @@ class GenerateSeederCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'db-craft:seeder {table?} {--connection=}';
+    protected $signature = 'get:seeder {table?} {--connection=}';
 
     /**
      * The console command description.
