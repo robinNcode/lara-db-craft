@@ -1,2 +1,5 @@
 # ignoring vendor directory
 vendor/
+
+# ignoring phpstorm project files
+.idea/
