@@ -5,6 +5,11 @@ namespace RobinNcode\LaravelDbCraft\Commands;
 use Illuminate\Console\Command;
 use RobinNcode\LaravelDbCraft\Services\MigrationGenerator;
 
+/**
+ * Command to generate migration files from existing database tables.
+ * Can generate for all tables or a specific table.
+ * @author RobinNcode
+ */
 class GenerateMigrationCommand extends Command
 {
     /**

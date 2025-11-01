@@ -6,6 +6,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
+/**
+ * Service to generate migrations from existing database tables.
+ * Generates migration files for all tables or specific tables,
+ * including columns, indexes, and foreign keys.
+ * 
+ * @author RobinNcode
+ */
+
 class MigrationGenerator
 {
     protected $connection;

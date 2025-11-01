@@ -1,7 +1,7 @@
 {
   "name": "robinncode/laravel-db-craft",
   "description": "Generate Laravel migrations and seeders from existing database connections",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "laravel",
     "migration",
