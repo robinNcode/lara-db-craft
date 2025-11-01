@@ -1,1 +1,255 @@
 <?php
+
+namespace RobinNcode\LaravelDbCraft\Services;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class SeederGenerator
+{
+    protected $connection;
+    protected $excludeTables;
+    protected $chunkSize;
+
+    public function __construct($connection = null)
+    {
+        $this->connection = $connection ?? config('database.default');
+        $this->excludeTables = config('db-craft.exclude_tables', []);
+        $this->chunkSize = config('db-craft.seeder_chunk_size', 100);
+    }
+
+    /**
+     * Generate seeders for all tables
+     */
+    public function generateAll()
+    {
+        $tables = $this->getAllTables();
+        $files = [];
+
+        foreach ($tables as $table) {
+            if (!in_array($table, $this->excludeTables)) {
+                $recordCount = $this->getTableRecordCount($table);
+
+                if ($recordCount > 0) {
+                    $files[$table] = $this->generateForTable($table);
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Generate seeder for a specific table
+     */
+    public function generateForTable($tableName)
+    {
+        $data = $this->getTableData($tableName);
+        $seederContent = $this->buildSeederContent($tableName, $data);
+
+        return $this->saveSeeder($tableName, $seederContent);
+    }
+
+    /**
+     * Get record count for a table
+     */
+    public function getTableRecordCount($tableName)
+    {
+        return DB::connection($this->connection)->table($tableName)->count();
+    }
+
+    /**
+     * Get all tables from database
+     */
+    protected function getAllTables()
+    {
+        $tables = [];
+        $driver = DB::connection($this->connection)->getDriverName();
+
+        switch ($driver) {
+            case 'mysql':
+                $tables = DB::connection($this->connection)
+                    ->select('SHOW TABLES');
+                $key = 'Tables_in_' . DB::connection($this->connection)->getDatabaseName();
+                $tables = array_map(function ($table) use ($key) {
+                    return $table->$key;
+                }, $tables);
+                break;
+            case 'pgsql':
+                $tables = DB::connection($this->connection)
+                    ->select("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
+                $tables = array_map(function ($table) {
+                    return $table->tablename;
+                }, $tables);
+                break;
+            case 'sqlite':
+                $tables = DB::connection($this->connection)
+                    ->select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+                $tables = array_map(function ($table) {
+                    return $table->name;
+                }, $tables);
+                break;
+        }
+
+        return $tables;
+    }
+
+    /**
+     * Get all data from a table
+     */
+    protected function getTableData($tableName)
+    {
+        return DB::connection($this->connection)
+            ->table($tableName)
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * Build seeder file content
+     */
+    protected function buildSeederContent($tableName, $data)
+    {
+        $className = Str::studly($tableName) . 'TableSeeder';
+        $dataCode = $this->buildDataCode($data);
+
+        return <<<PHP
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class {$className} extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Disable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        // Truncate the table
+        DB::table('{$tableName}')->truncate();
+        
+        // Insert data in chunks
+{$dataCode}
+        
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    }
+}
+PHP;
+    }
+
+    /**
+     * Build data insertion code
+     */
+    protected function buildDataCode($data)
+    {
+        if (empty($data)) {
+            return "        // No data to seed";
+        }
+
+        $chunks = array_chunk($data, $this->chunkSize);
+        $code = [];
+
+        foreach ($chunks as $chunk) {
+            $arrayData = $this->convertToArrayString($chunk);
+            $code[] = "        DB::table('{$this->getCurrentTable()}')->insert({$arrayData});";
+        }
+
+        return implode("\n\n", $code);
+    }
+
+    /**
+     * Convert data to array string representation
+     */
+    protected function convertToArrayString($data)
+    {
+        $result = "[\n";
+
+        foreach ($data as $row) {
+            $result .= "            [\n";
+
+            foreach ($row as $key => $value) {
+                $formattedValue = $this->formatValue($value);
+                $result .= "                '{$key}' => {$formattedValue},\n";
+            }
+
+            $result .= "            ],\n";
+        }
+
+        $result .= "        ]";
+
+        return $result;
+    }
+
+    /**
+     * Format value for PHP array
+     */
+    protected function formatValue($value)
+    {
+        if ($value === null) {
+            return 'null';
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if ($value instanceof \DateTime) {
+            return "'" . $value->format('Y-m-d H:i:s') . "'";
+        }
+
+        // Escape single quotes and format as string
+        $escaped = str_replace("'", "\\'", $value);
+        $escaped = str_replace("\n", "\\n", $escaped);
+        $escaped = str_replace("\r", "\\r", $escaped);
+        $escaped = str_replace("\t", "\\t", $escaped);
+
+        return "'{$escaped}'";
+    }
+
+    /**
+     * Get current table name (used in closure)
+     */
+    protected function getCurrentTable()
+    {
+        return $this->currentTable ?? '';
+    }
+
+    /**
+     * Save seeder file
+     */
+    protected function saveSeeder($tableName, $content)
+    {
+        $this->currentTable = $tableName;
+
+        $className = Str::studly($tableName) . 'TableSeeder';
+        $filename = "{$className}.php";
+        $path = config('db-craft.seeders_path', database_path('seeders'));
+
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        // Update content with actual table name in insert statements
+        $content = str_replace(
+            "DB::table('')",
+            "DB::table('{$tableName}')",
+            $content
+        );
+
+        $filepath = $path . '/' . $filename;
+        file_put_contents($filepath, $content);
+
+        return $filename;
+    }
+}
