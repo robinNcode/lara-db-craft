@@ -44,5 +44,12 @@
     }
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "homepage": "https://github.com/robinNcode/lara-db-craft",
+  "repository": "https://github.com/robinNcode/lara-db-craft.git",
+  "support": {
+    "documentation": "https://github.com/robinNcode/lara-db-craft/blob/master/README.md",
+    "email": "msmrobin518@gmail.com",
+    "issues": "https://github.com/robinNcode/lara-db-craft/issues"
+  }
 }
